@@ -1,1 +1,1 @@
-Sitemap: https://software-ave.github.io/https://www.software-ave.com/sitemap.xml
+Sitemap: https://software-ave.github.io/sitemap.xml
