@@ -32,7 +32,7 @@ jobs:
         uses: actions/configure-pages@v4
       - name: Build with Jekyll
         # uses: actions/jekyll-build-pages@v1
-        uses: lemonarc/jekyll-action@1.0.0
+        uses: jerryjvl/jekyll-build-action@v1
         with:
           source: ./
           destination: ./_site
