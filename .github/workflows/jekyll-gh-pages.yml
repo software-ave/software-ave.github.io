@@ -31,7 +31,8 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
+        # uses: actions/jekyll-build-pages@v1
+        uses: lemonarc/jekyll-action@1.0.0
         with:
           source: ./
           destination: ./_site
@@ -43,6 +44,7 @@ jobs:
         with:
           folder: ./_site
           token: ${{ secrets.DEPLOY_TOKEN }}
+          branch: docs
 
 
 
