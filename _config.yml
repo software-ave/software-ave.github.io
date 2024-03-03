@@ -20,21 +20,13 @@ plugins:
   - jekyll-seo-tag
   
 authors:
-    sal:
-      name:           Sal
-      site:           https://www.wowthemes.net
+    cutlass:
+      name:           王君敕
+      site:           https://wangxuan.me
       avatar:         assets/images/avatar1.jpg
-      bio:            "Hi, I am Sal, the author of Mundana, the theme you're currently previewing. I hope you like it!"
-      email:          wowthemesnet@gmail.com
-      twitter:        https://twitter.com/wowthemesnet
-
-    jane:
-      name:           Jane
-      site:           https://www.wowthemes.net
-      avatar:         assets/images/avatar2.jpg
-      bio:            "Blogger, fashionista, love to explore new ideas and write on my morning coffee!"
-      email:          fakemail@gmail.com
-      twitter:        https://twitter.com/wowthemesnet
+      bio:            "只身打马过草原，独自仗剑走天涯"
+      email:          shawnwang1984@gmail.com
+      twitter:        https://weibo.com/halfg0d
  
 # Defaults
 defaults:
@@ -44,7 +36,7 @@ defaults:
       path: "_posts"
     values:
       layout: post
-      author: sal
+      author: cutlass
       avatar: assets/images/avatar1.jpg
       
   # all pages
