@@ -1,5 +1,5 @@
 source "https://rubygems.org"
-ruby '3.3.0'
+ruby RUBY_VERSION # 这表示您的程序需要和当前 Ruby 解释器相同的版本
 
 # Hello! This is where you manage which Jekyll version is used to run.
 # When you want to use a different version, change it below, save the
