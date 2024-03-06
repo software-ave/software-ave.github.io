@@ -75,89 +75,61 @@ image: assets/images/20240302/P1030863.jpeg
 
 ![](/assets/images/20240302/P1030829.jpeg)
 丰盛的园区，这里一切还都正常。
+
 ![](/assets/images/20240302/P1030830.jpeg)
-
 ![](/assets/images/20240302/P1030831.jpeg)
-
 ![](/assets/images/20240302/P1030832.jpeg)
-
-![](/assets/images/20240302/P1030833.jpeg)
 公交站台
 
+![](/assets/images/20240302/P1030833.jpeg)
 ![](/assets/images/20240302/P1030834.jpeg)
 软件大道和西春路的交界处。这个广场终于完工了，现在的名字叫“江苏南海科技广场”，之前的名字是“花神科技广场”，二十年前这里叫“花神家具港”
 
 
 ![](/assets/images/20240302/P1030835.jpeg)
-
 ![](/assets/images/20240302/P1030836.jpeg)
-
 ![](/assets/images/20240302/P1030837.jpeg)
-
 ![](/assets/images/20240302/P1030838.jpeg)
-
 ![](/assets/images/20240302/P1030839.jpeg)
-
 ![](/assets/images/20240302/P1030840.jpeg)
-
 ![](/assets/images/20240302/P1030841.jpeg)
-
 ![](/assets/images/20240302/P1030842.jpeg)
-
 ![](/assets/images/20240302/P1030843.jpeg)
-
 ![](/assets/images/20240302/P1030844.jpeg)
-
 ![](/assets/images/20240302/P1030845.jpeg)
-
 ![](/assets/images/20240302/P1030846.jpeg)
-
 ![](/assets/images/20240302/P1030847.jpeg)
 
 这些办公楼看起来已经有些破旧，不知里面的企业还好吗...
 
 ![](/assets/images/20240302/P1030848.jpeg)
-
 ![](/assets/images/20240302/P1030849.jpeg)
-
 ![](/assets/images/20240302/P1030850.jpeg)
 现在看到的是第一座烂尾楼。我的记忆中起码烂尾十年了。
 
 ![](/assets/images/20240302/P1030851.jpeg)
-
 ![](/assets/images/20240302/P1030852.jpeg)
-
 ![](/assets/images/20240302/P1030853.jpeg)
-
 ![](/assets/images/20240302/P1030854.jpeg)
-
 ![](/assets/images/20240302/P1030855.jpeg)
 这里好像可以进去，但是太杂乱，进去也费尽，恐怕有危险。
 ![](/assets/images/20240302/P1030856.jpeg)
-
 ![](/assets/images/20240302/P1030857.jpeg)
 马上到安德门大街。
 ![](/assets/images/20240302/P1030858.jpeg)
 这座可能是软件大道上最著名的烂尾建筑--“东方娃娃”，很有童话色彩的建筑，不知道为什么它就烂尾了，我来软件大道工作的时候它就在这杵着了，估摸着得有20多年了。
 
 ![](/assets/images/20240302/P1030859.jpeg)
-
 ![](/assets/images/20240302/P1030860.jpeg)
-
 ![](/assets/images/20240302/P1030861.jpeg)
 有人把这当仓库了。
 
 ![](/assets/images/20240302/P1030862.jpeg)
-
 ![](/assets/images/20240302/P1030863.jpeg)
 这个涂鸦我非常喜欢。
 ![](/assets/images/20240302/P1030864.jpeg)
-
-
 ![](/assets/images/20240302/P1030866.jpeg)
-
 ![](/assets/images/20240302/P1030867.jpeg)
-
 ![](/assets/images/20240302/P1030869.jpeg)
 和东方娃娃一街之隔的就是荣耀大厦。很有科技感的建筑。这种对比挺有意思 :）
 
