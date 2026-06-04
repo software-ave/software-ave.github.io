@@ -1,14 +1,101 @@
 <!-- src/pages/HomePage.vue -->
 <template>
   <div class="home-page">
-    <!-- 英雄区域 -->
-    <section class="hero-section" v-if="showHero">
-      <div class="hero-content">
+    <!-- 主内容区 -->
+    <div class="main-area">
+      <!-- 英雄区域 -->
+      <section class="hero-section" v-if="showHero">
         <h1 class="hero-title">前端技术博客</h1>
         <p class="hero-subtitle">分享前端开发经验、技术思考与实战案例</p>
-        <div class="hero-search">
+      </section>
+
+      <!-- 文章列表 -->
+      <main class="main-content">
+        <div class="content-header">
+          <h2 class="content-title">
+            {{ activeTag ? `"${activeTag}" 相关文章` : '最新文章' }}
+            <span class="article-count">({{ paginatedArticles.length }}篇)</span>
+          </h2>
+        </div>
+
+        <!-- 加载状态 -->
+        <div v-if="loading" class="loading-container">
+          <div class="loader">
+            <div class="loader-spinner"></div>
+            <p>加载文章中...</p>
+          </div>
+        </div>
+
+        <!-- 无内容提示 -->
+        <div v-else-if="filteredArticles.length === 0" class="empty-state">
+          <svg class="empty-icon" viewBox="0 0 24 24" width="64" height="64">
+            <path fill="currentColor" d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
+          </svg>
+          <h3>{{ searchQuery ? '未找到相关文章' : '暂无文章' }}</h3>
+          <p v-if="searchQuery">请尝试其他搜索词</p>
+          <button v-else @click="refresh" class="refresh-btn">刷新页面</button>
+        </div>
+
+        <!-- 文章网格 -->
+        <div v-else class="articles-grid">
+          <div
+            v-for="article in paginatedArticles"
+            :key="article.id"
+            class="article-item"
+          >
+            <ArticleCard :article="article" />
+          </div>
+        </div>
+
+        <!-- 分页 -->
+        <div v-if="totalPages > 1" class="pagination">
+          <button
+            @click="prevPage"
+            :disabled="currentPage === 1"
+            class="pagination-btn prev-btn"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16">
+              <path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+            </svg>
+            上一页
+          </button>
+          
+          <div class="page-numbers">
+            <button
+              v-for="page in visiblePages"
+              :key="page"
+              @click="goToPage(page)"
+              :class="{
+                'page-btn': true,
+                active: page === currentPage
+              }"
+            >
+              {{ page === '...' ? '...' : page }}
+            </button>
+          </div>
+          
+          <button
+            @click="nextPage"
+            :disabled="currentPage === totalPages"
+            class="pagination-btn next-btn"
+          >
+            下一页
+            <svg viewBox="0 0 24 24" width="16" height="16">
+              <path fill="currentColor" d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+            </svg>
+          </button>
+        </div>
+      </main>
+    </div>
+
+    <!-- 侧边栏 -->
+    <aside class="sidebar" v-if="showSidebar">
+      <!-- 搜索 -->
+      <div class="sidebar-widget">
+        <h3 class="widget-title">🔍 搜索</h3>
+        <div class="sidebar-search">
           <div class="search-box">
-            <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20">
+            <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18">
               <path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
             </svg>
             <input
@@ -28,147 +115,51 @@
           </div>
         </div>
       </div>
-      
-      <div class="hero-stats" v-if="showStats">
-        <div class="stat-card">
-          <div class="stat-number">{{ totalArticles }}</div>
-          <div class="stat-label">文章总数</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">{{ totalComments }}</div>
-          <div class="stat-label">评论总数</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">{{ totalViews }}</div>
-          <div class="stat-label">累计阅读</div>
-        </div>
-      </div>
-    </section>
 
-    <!-- 热门标签 -->
-    <section class="tags-section" v-if="showTags">
-      <div class="section-header">
-        <h2 class="section-title">热门标签</h2>
-        <router-link to="/tags" class="view-all">查看全部</router-link>
-      </div>
-      <div class="tags-container">
-        <button
-          v-for="tag in popularTags"
-          :key="tag.name"
-          class="tag-pill"
-          :style="getTagStyle(tag.name)"
-          :class="{ active: activeTag === tag.name }"
-          @click="toggleTag(tag.name)"
-        >
-          <span class="tag-name">{{ tag.name }}</span>
-          <span class="tag-count">{{ tag.count }}</span>
-        </button>
-        <button
-          v-if="activeTag"
-          @click="clearTag"
-          class="clear-tag-btn"
-        >
-          清除筛选
-        </button>
-      </div>
-    </section>
-
-    <!-- 文章列表 -->
-    <main class="main-content">
-      <div class="content-header">
-        <h2 class="content-title">
-          {{ activeTag ? `"${activeTag}" 相关文章` : '最新文章' }}
-          <span class="article-count">({{ paginatedArticles.length }}篇)</span>
-        </h2>
-        
-        <div class="sort-controls">
-          <select v-model="sortBy" class="sort-select">
-            <option value="created_at">最新发布</option>
-            <option value="view_count">最多阅读</option>
-            <option value="comment_count">最多评论</option>
-            <option value="like_count">最多点赞</option>
-          </select>
+      <!-- 统计 -->
+      <div class="sidebar-widget" v-if="showStats">
+        <h3 class="widget-title">📊 博客统计</h3>
+        <div class="sidebar-stats">
+          <div class="sidebar-stat">
+            <span class="sidebar-stat-number">{{ totalArticles }}</span>
+            <span class="sidebar-stat-label">文章</span>
+          </div>
+          <div class="sidebar-stat">
+            <span class="sidebar-stat-number">{{ totalComments }}</span>
+            <span class="sidebar-stat-label">评论</span>
+          </div>
+          <div class="sidebar-stat">
+            <span class="sidebar-stat-number">{{ totalViews }}</span>
+            <span class="sidebar-stat-label">阅读</span>
+          </div>
         </div>
       </div>
 
-      <!-- 加载状态 -->
-      <div v-if="loading" class="loading-container">
-        <div class="loader">
-          <div class="loader-spinner"></div>
-          <p>加载文章中...</p>
-        </div>
-      </div>
-
-      <!-- 无内容提示 -->
-      <div v-else-if="filteredArticles.length === 0" class="empty-state">
-        <svg class="empty-icon" viewBox="0 0 24 24" width="64" height="64">
-          <path fill="currentColor" d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
-        </svg>
-        <h3>{{ searchQuery ? '未找到相关文章' : '暂无文章' }}</h3>
-        <p v-if="searchQuery">请尝试其他搜索词</p>
-        <button v-else @click="refresh" class="refresh-btn">刷新页面</button>
-      </div>
-
-      <!-- 文章网格 -->
-      <div v-else class="articles-grid">
-        <div
-          v-for="article in paginatedArticles"
-          :key="article.id"
-          class="article-item"
-        >
-          <ArticleCard :article="article" />
-        </div>
-      </div>
-
-      <!-- 分页 -->
-      <div v-if="totalPages > 1" class="pagination">
-        <button
-          @click="prevPage"
-          :disabled="currentPage === 1"
-          class="pagination-btn prev-btn"
-        >
-          <svg viewBox="0 0 24 24" width="16" height="16">
-            <path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
-          </svg>
-          上一页
-        </button>
-        
-        <div class="page-numbers">
+      <!-- 热门标签 -->
+      <div class="sidebar-widget" v-if="showTags">
+        <h3 class="widget-title">🏷️ 热门标签</h3>
+        <div class="sidebar-tags">
           <button
-            v-for="page in visiblePages"
-            :key="page"
-            @click="goToPage(page)"
-            :class="{
-              'page-btn': true,
-              active: page === currentPage
-            }"
+            v-for="tag in popularTags"
+            :key="tag.name"
+            class="tag-pill"
+            :style="getTagStyle(tag.name)"
+            :class="{ active: activeTag === tag.name }"
+            @click="toggleTag(tag.name)"
           >
-            {{ page === '...' ? '...' : page }}
+            <span class="tag-name">{{ tag.name }}</span>
+            <span class="tag-count">{{ tag.count }}</span>
+          </button>
+          <button
+            v-if="activeTag"
+            @click="clearTag"
+            class="clear-tag-btn"
+          >
+            清除筛选
           </button>
         </div>
-        
-        <button
-          @click="nextPage"
-          :disabled="currentPage === totalPages"
-          class="pagination-btn next-btn"
-        >
-          下一页
-          <svg viewBox="0 0 24 24" width="16" height="16">
-            <path fill="currentColor" d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-          </svg>
-        </button>
       </div>
 
-      <!-- 文章统计 -->
-      <div v-if="showStats" class="stats-footer">
-        <div class="stats-summary">
-          <p>共 {{ totalArticles }} 篇文章，{{ totalComments }} 条评论，{{ totalViews }} 次阅读</p>
-        </div>
-      </div>
-    </main>
-
-    <!-- 侧边栏 -->
-    <aside class="sidebar" v-if="showSidebar">
       <!-- 热门文章 -->
       <div class="sidebar-widget">
         <h3 class="widget-title">🔥 热门文章</h3>
@@ -197,6 +188,7 @@
       <div class="sidebar-widget">
         <h3 class="widget-title">💬 最新评论</h3>
         <div class="recent-comments">
+          <div v-if="recentComments.length === 0" class="no-comments-tip">暂无评论</div>
           <div
             v-for="comment in recentComments"
             :key="comment.id"
@@ -250,6 +242,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useArticleStore } from '@/stores/useArticleStore'
 import { useCommentStore } from '@/stores/useCommentStore'
+import { supabase } from '@/api/supabase'
 import ArticleCard from '@/components/ArticleCard.vue'
 import { debounce } from 'lodash-es'
 
@@ -261,7 +254,6 @@ const commentStore = useCommentStore()
 // 响应式数据
 const searchQuery = ref('')
 const activeTag = ref('')
-const sortBy = ref('created_at')
 const currentPage = ref(1)
 const pageSize = 12
 const showScrollToTop = ref(false)
@@ -316,12 +308,7 @@ const filteredArticles = computed(() => {
   }
   
   // 排序
-  return articles.sort((a, b) => {
-    if (sortBy.value === 'created_at') {
-      return new Date(b.created_at) - new Date(a.created_at)
-    }
-    return (b[sortBy.value] || 0) - (a[sortBy.value] || 0)
-  })
+  return articles.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 })
 
 // 分页相关计算
@@ -400,12 +387,24 @@ const popularArticles = computed(() =>
     .slice(0, 5)
 )
 
-const recentComments = computed(() => 
-  commentStore.comments
-    .filter(comment => comment.is_approved && !comment.is_spam)
-    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-    .slice(0, 5)
-)
+const recentComments = ref([])
+
+async function fetchRecentComments() {
+  try {
+    const { data, error: supabaseError } = await supabase
+      .from('comments')
+      .select('*, articles(title)')
+      .eq('is_approved', true)
+      .eq('is_spam', false)
+      .order('created_at', { ascending: false })
+      .limit(5)
+
+    if (supabaseError) throw supabaseError
+    recentComments.value = data || []
+  } catch (err) {
+    console.error('获取最新评论失败:', err)
+  }
+}
 
 const archives = computed(() => {
   const archiveMap = {}
@@ -536,7 +535,6 @@ const updateURL = () => {
 const readFromURL = () => {
   searchQuery.value = route.query.search || ''
   activeTag.value = route.query.tag || ''
-  sortBy.value = route.query.sort || 'created_at'
   
   const pageMatch = route.hash?.match(/page-(\d+)/)
   if (pageMatch) {
@@ -561,7 +559,7 @@ const refresh = async () => {
   loading.value = true
   await Promise.all([
     articleStore.fetchArticles(),
-    commentStore.fetchComments()
+    fetchRecentComments()
   ])
   loading.value = false
 }
@@ -572,7 +570,7 @@ onMounted(async () => {
   loading.value = true
   await Promise.all([
     articleStore.fetchArticles(),
-    commentStore.fetchComments()
+    fetchRecentComments()
   ])
   loading.value = false
   
@@ -600,78 +598,68 @@ onMounted(async () => {
   margin: 0 auto;
   padding: 0 1.5rem;
   position: relative;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 2rem;
+  align-items: start;
+}
+
+/* 主内容区 */
+.main-area {
+  min-width: 0;
 }
 
 /* 英雄区域 */
 .hero-section {
   text-align: center;
-  padding: 4rem 0 3rem;
+  padding: 3rem 0 2rem;
   position: relative;
   overflow: hidden;
-}
-
-.hero-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100%;
+  border-radius: 16px;
+  margin-bottom: 1.5rem;
   background: linear-gradient(135deg, #4dabf7 0%, #339af0 100%);
-  clip-path: ellipse(120% 100% at 50% 0%);
-  z-index: -1;
-}
-
-.hero-content {
-  position: relative;
-  z-index: 1;
-  color: white;
-  max-width: 800px;
-  margin: 0 auto;
 }
 
 .hero-title {
-  font-size: 3.5rem;
+  font-size: 2.5rem;
   font-weight: 800;
-  margin: 0 0 1rem;
+  margin: 0 0 0.5rem;
   line-height: 1.2;
-  background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: white;
 }
 
 .hero-subtitle {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   opacity: 0.9;
-  margin-bottom: 2.5rem;
+  margin: 0;
   font-weight: 400;
+  color: white;
 }
 
-.hero-search {
-  max-width: 600px;
-  margin: 0 auto;
+/* 侧边栏搜索 */
+.sidebar-search {
+  margin-top: 0.5rem;
 }
 
 .search-box {
   position: relative;
   background: white;
-  border-radius: 12px;
-  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  padding: 0.4rem 0.75rem;
   display: flex;
   align-items: center;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  border: 2px solid #e9ecef;
   transition: all 0.3s;
 }
 
 .search-box:focus-within {
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-  transform: translateY(-2px);
+  border-color: #4dabf7;
+  box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.1);
 }
 
 .search-icon {
   color: #868e96;
-  margin-right: 0.75rem;
+  margin-right: 0.5rem;
   flex-shrink: 0;
 }
 
@@ -679,8 +667,8 @@ onMounted(async () => {
   flex: 1;
   border: none;
   outline: none;
-  font-size: 1.1rem;
-  padding: 1rem 0;
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
   background: transparent;
   color: #2c3e50;
   width: 100%;
@@ -693,7 +681,7 @@ onMounted(async () => {
 .clear-btn {
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   color: #adb5bd;
   cursor: pointer;
   padding: 0.25rem 0.5rem;
@@ -705,143 +693,92 @@ onMounted(async () => {
   color: #fa5252;
 }
 
-/* 统计数据 */
-.hero-stats {
+/* 侧边栏统计 */
+.sidebar-stats {
   display: flex;
-  justify-content: center;
-  gap: 3rem;
-  margin-top: 3rem;
-  flex-wrap: wrap;
+  justify-content: space-around;
+  padding: 0.5rem 0;
 }
 
-.stat-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 1.5rem 2.5rem;
-  min-width: 150px;
-  text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s;
-}
-
-.stat-card:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-4px);
-}
-
-.stat-number {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: white;
-  margin-bottom: 0.5rem;
-}
-
-.stat-label {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.95rem;
-  font-weight: 500;
-}
-
-/* 标签区域 */
-.tags-section {
-  margin: 3rem 0 2rem;
-}
-
-.section-header {
+.sidebar-stat {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 1.5rem;
+  gap: 0.25rem;
 }
 
-.section-title {
+.sidebar-stat-number {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #2c3e50;
-  margin: 0;
-}
-
-.view-all {
   color: #339af0;
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 0.95rem;
-  transition: color 0.2s;
 }
 
-.view-all:hover {
-  color: #228be6;
-  text-decoration: underline;
+.sidebar-stat-label {
+  font-size: 0.8rem;
+  color: #868e96;
 }
 
-.tags-container {
+/* 侧边栏标签 */
+.sidebar-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  align-items: center;
+  gap: 0.5rem;
 }
 
 .tag-pill {
-  padding: 0.5rem 1.25rem;
-  border-radius: 25px;
-  border: 2px solid transparent;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.3s;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.35rem;
   background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid transparent;
 }
 
 .tag-pill:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
 .tag-pill.active {
   border-width: 2px;
   font-weight: 700;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.12);
 }
 
-.tag-name {
-  font-weight: inherit;
-}
+.tag-name { font-weight: inherit; }
 
 .tag-count {
   background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
-  padding: 0.1rem 0.5rem;
-  font-size: 0.8rem;
+  border-radius: 10px;
+  padding: 0.05rem 0.4rem;
+  font-size: 0.7rem;
   font-weight: 600;
 }
 
 .clear-tag-btn {
-  padding: 0.5rem 1.25rem;
-  border-radius: 25px;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
   border: 2px solid #fa5252;
   background: white;
   color: #fa5252;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
-  font-size: 0.95rem;
+  font-size: 0.8rem;
 }
 
 .clear-tag-btn:hover {
   background: #fa5252;
   color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(250, 82, 82, 0.3);
 }
 
 /* 主内容区域 */
 .main-content {
-  margin-top: 2rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -869,35 +806,6 @@ onMounted(async () => {
   font-size: 1rem;
   font-weight: 400;
   color: #868e96;
-}
-
-.sort-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.sort-select {
-  padding: 0.5rem 1rem 0.5rem 0.75rem;
-  border: 2px solid #e9ecef;
-  border-radius: 8px;
-  background: white;
-  color: #495057;
-  font-size: 0.95rem;
-  cursor: pointer;
-  outline: none;
-  transition: border-color 0.2s;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23495057' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.5rem center;
-  background-size: 16px 12px;
-  padding-right: 2rem;
-}
-
-.sort-select:focus {
-  border-color: #4dabf7;
-  box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.1);
 }
 
 /* 文章网格 */
@@ -1071,10 +979,13 @@ onMounted(async () => {
 
 /* 侧边栏 */
 .sidebar {
-  margin-top: 3rem;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: sticky;
+  top: 5rem;
+  max-height: calc(100vh - 6rem);
+  overflow-y: auto;
 }
 
 .sidebar-widget {
@@ -1166,6 +1077,13 @@ onMounted(async () => {
 }
 
 /* 最新评论 */
+.no-comments-tip {
+  text-align: center;
+  color: #adb5bd;
+  font-size: 0.9rem;
+  padding: 1rem 0;
+}
+
 .recent-comments {
   display: flex;
   flex-direction: column;
@@ -1307,56 +1225,20 @@ onMounted(async () => {
 }
 
 /* 响应式设计 */
-@media (min-width: 1024px) {
-  .home-page {
-    display: grid;
-    grid-template-columns: 1fr 350px;
-    gap: 3rem;
-  }
-  
-  .main-content {
-    grid-column: 1;
-  }
-  
-  .sidebar {
-    grid-column: 2;
-    margin-top: 0;
-    display: block;
-  }
-  
-  .sidebar-widget {
-    margin-bottom: 2rem;
-  }
-  
-  .scroll-to-top {
-    opacity: 1;
-    transform: none;
-    pointer-events: auto;
-  }
-}
-
 @media (max-width: 1023px) {
+  .home-page {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    max-height: none;
+  }
+
   .hero-title {
-    font-size: 2.5rem;
-  }
-  
-  .hero-subtitle {
-    font-size: 1.1rem;
-  }
-  
-  .hero-stats {
-    gap: 1.5rem;
-  }
-  
-  .stat-card {
-    padding: 1.25rem 2rem;
-    min-width: 120px;
-  }
-  
-  .stat-number {
     font-size: 2rem;
   }
-  
+
   .articles-grid {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
@@ -1367,59 +1249,27 @@ onMounted(async () => {
   .home-page {
     padding: 0 1rem;
   }
-  
+
   .hero-section {
-    padding: 3rem 0 2rem;
+    padding: 2rem 1rem 1.5rem;
   }
-  
+
   .hero-title {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
-  
-  .hero-stats {
-    gap: 1rem;
-  }
-  
-  .stat-card {
-    padding: 1rem 1.5rem;
-    min-width: 100px;
-  }
-  
-  .stat-number {
-    font-size: 1.5rem;
-  }
-  
+
   .content-header {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .articles-grid {
     grid-template-columns: 1fr;
   }
-  
-  .tags-container {
-    justify-content: center;
-  }
-  
+
   .scroll-to-top {
     bottom: 1rem;
     right: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero-title {
-    font-size: 1.8rem;
-  }
-  
-  .hero-stats {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .stat-card {
-    width: 200px;
   }
 }
 </style>

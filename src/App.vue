@@ -9,6 +9,14 @@
           </router-link>
           <div class="nav-links">
             <router-link to="/">首页</router-link>
+            <router-link to="/create" class="write-link">
+              <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              写文章
+            </router-link>
+            <router-link to="/admin" class="admin-link">
+              <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+              审核
+            </router-link>
             <router-link to="/about">关于</router-link>
           </div>
         </nav>
@@ -120,6 +128,52 @@ body {
   height: 2px;
   background: var(--primary-color);
   border-radius: 1px;
+}
+
+.write-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--primary-color);
+  color: white !important;
+  padding: 0.4rem 1rem !important;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+
+.write-link:hover {
+  background: #228be6 !important;
+  color: white !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(51, 154, 240, 0.3);
+}
+
+.write-link.router-link-active::after {
+  display: none;
+}
+
+.admin-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #868e96;
+  color: white !important;
+  padding: 0.4rem 1rem !important;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+
+.admin-link:hover {
+  background: #495057 !important;
+  color: white !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.admin-link.router-link-active::after {
+  display: none;
 }
 
 .main {

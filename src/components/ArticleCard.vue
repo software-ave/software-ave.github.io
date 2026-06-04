@@ -27,7 +27,6 @@
           <time class="publish-date">
             {{ formatDate(article.created_at) }}
           </time>
-          <span class="view-count">👁 {{ article.view_count || 0 }}</span>
         </div>
       </div>
       
@@ -37,43 +36,7 @@
         {{ article.excerpt || truncateContent(article.content, 150) }}
       </p>
       
-      <div class="article-footer">
-        <div class="author-info">
-          <div class="author-avatar">
-            <img 
-              v-if="article.author_avatar"
-              :src="article.author_avatar" 
-              :alt="article.author"
-              class="avatar"
-            />
-            <div v-else class="avatar-default">
-              {{ getInitials(article.author) }}
-            </div>
-          </div>
-          <span class="author-name">{{ article.author || '管理员' }}</span>
-        </div>
-        
-        <div class="article-stats">
-          <div class="stat-item">
-            <svg class="stat-icon" viewBox="0 0 24 24" width="16" height="16">
-              <path fill="currentColor" d="M12 4c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8zm-2 13l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
-            </svg>
-            <span class="stat-text">{{ article.comment_count || 0 }}</span>
-          </div>
-          <div class="stat-item">
-            <svg class="stat-icon" viewBox="0 0 24 24" width="16" height="16">
-              <path fill="currentColor" d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91l-.01-.01L23 10z"/>
-            </svg>
-            <span class="stat-text">{{ article.like_count || 0 }}</span>
-          </div>
-          <div class="stat-item">
-            <svg class="stat-icon" viewBox="0 0 24 24" width="16" height="16">
-              <path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
-            </svg>
-            <span class="stat-text">{{ getReadTime(article.content) }} 分钟</span>
-          </div>
-        </div>
-      </div>
+
     </div>
   </article>
 </template>
@@ -118,20 +81,6 @@ const truncateContent = (content, maxLength) => {
   if (!content) return ''
   if (content.length <= maxLength) return content
   return content.substring(0, maxLength) + '...'
-}
-
-// 获取阅读时间
-const getReadTime = (content) => {
-  if (!content) return 0
-  const wordCount = content.trim().split(/\s+/).length
-  const readingSpeed = 200 // 每分钟阅读字数
-  return Math.max(1, Math.round(wordCount / readingSpeed))
-}
-
-// 获取作者首字母
-const getInitials = (name) => {
-  if (!name) return 'A'
-  return name.charAt(0).toUpperCase()
 }
 
 // 获取文章标签
@@ -278,13 +227,6 @@ const filterByTag = (tag) => {
   font-weight: 500;
 }
 
-.view-count {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.85rem;
-}
-
 .article-title {
   margin: 0;
   font-size: 1.5rem;
@@ -308,83 +250,6 @@ const filterByTag = (tag) => {
   -webkit-box-orient: vertical;
   overflow: hidden;
   font-size: 0.95rem;
-}
-
-.article-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 1rem;
-  border-top: 1px solid #f1f3f5;
-  margin-top: auto;
-}
-
-.author-info {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.author-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: linear-gradient(135deg, #4dabf7, #339af0);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.avatar {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatar-default {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 700;
-  font-size: 1rem;
-}
-
-.author-name {
-  font-weight: 600;
-  color: #495057;
-  font-size: 0.95rem;
-}
-
-.article-stats {
-  display: flex;
-  gap: 1.25rem;
-  align-items: center;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #868e96;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.stat-icon {
-  opacity: 0.7;
-  transition: opacity 0.2s;
-}
-
-.article-card:hover .stat-icon {
-  opacity: 1;
-}
-
-.stat-text {
-  min-width: 2.5em;
 }
 
 /* 无封面图片的样式 */
@@ -419,17 +284,6 @@ const filterByTag = (tag) => {
   
   .date-views {
     order: -1;
-  }
-  
-  .article-footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-  
-  .article-stats {
-    width: 100%;
-    justify-content: space-between;
   }
 }
 

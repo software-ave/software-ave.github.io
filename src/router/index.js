@@ -16,6 +16,22 @@ const routes = [
     props: true
   },
   {
+    path: '/create',
+    name: 'create',
+    component: () => import('@/pages/ArticleCreatePage.vue')
+  },
+  {
+    path: '/edit/:id',
+    name: 'edit',
+    component: () => import('@/pages/ArticleCreatePage.vue'),
+    props: true
+  },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: () => import('@/pages/AdminPage.vue')
+  },
+  {
     path: '/about',
     name: 'about',
     component: () => import('@/pages/AboutPage.vue')

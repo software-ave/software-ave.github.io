@@ -11,7 +11,7 @@ export const useCommentStore = defineStore('comments', () => {
   const page = ref(1)
   const pageSize = 20
   const hasMore = ref(true)
-  const articleId = ref('')
+  const currentArticleId = ref('')
 
   // 计算属性
   const totalComments = computed(() => comments.value.length)
@@ -22,7 +22,7 @@ export const useCommentStore = defineStore('comments', () => {
   // 获取文章评论
   async function fetchComments(articleId, reset = true) {
     if (reset) {
-      this.articleId = articleId
+      currentArticleId.value = articleId
       page.value = 1
       comments.value = []
     }
@@ -62,17 +62,15 @@ export const useCommentStore = defineStore('comments', () => {
   // 添加评论
   async function addComment(commentData) {
     try {
-      const { data, error: supabaseError } = await supabase
+      // 不用 .select()，因为新评论 is_approved=false，SELECT 策略不允许回读
+      const { error: supabaseError } = await supabase
         .from('comments')
         .insert([commentData])
-        .select()
       
       if (supabaseError) throw supabaseError
-      
-      // 实时添加到列表
-      comments.value.unshift(data[0])
-      
-      return { success: true, data: data[0] }
+
+      // 不加入本地列表（未审核），等审核通过后通过实时订阅显示
+      return { success: true }
     } catch (err) {
       console.error('添加评论失败:', err)
       return { success: false, error: err.message }
@@ -84,7 +82,7 @@ export const useCommentStore = defineStore('comments', () => {
     if (!hasMore.value || loading.value) return
     
     page.value++
-    await fetchComments(articleId.value, false)
+    await fetchComments(currentArticleId.value, false)
   }
 
   // 订阅实时更新
@@ -97,7 +95,7 @@ export const useCommentStore = defineStore('comments', () => {
           event: 'INSERT',
           schema: 'public',
           table: 'comments',
-          filter: `article_id=eq.${articleId.value}`
+          filter: `article_id=eq.${currentArticleId.value}`
         },
         (payload) => {
           comments.value.unshift(payload.new)
@@ -110,7 +108,7 @@ export const useCommentStore = defineStore('comments', () => {
           event: 'UPDATE',
           schema: 'public',
           table: 'comments',
-          filter: `article_id=eq.${articleId.value}`
+          filter: `article_id=eq.${currentArticleId.value}`
         },
         (payload) => {
           const index = comments.value.findIndex(c => c.id === payload.new.id)
@@ -124,6 +122,67 @@ export const useCommentStore = defineStore('comments', () => {
     return () => supabase.removeChannel(channel)
   }
 
+  // ========== 管理员审核相关 ==========
+
+  const pendingComments = ref([])
+  const pendingLoading = ref(false)
+
+  // 获取待审核评论
+  async function fetchPendingComments() {
+    pendingLoading.value = true
+    try {
+      const { data, error: supabaseError } = await supabase
+        .from('comments')
+        .select('*')
+        .eq('is_approved', false)
+        .eq('is_spam', false)
+        .order('created_at', { ascending: false })
+
+      if (supabaseError) throw supabaseError
+      pendingComments.value = data || []
+    } catch (err) {
+      console.error('获取待审核评论失败:', err)
+    } finally {
+      pendingLoading.value = false
+    }
+  }
+
+  // 通过评论
+  async function approveComment(commentId) {
+    try {
+      const { error: supabaseError } = await supabase
+        .from('comments')
+        .update({ is_approved: true })
+        .eq('id', commentId)
+
+      if (supabaseError) throw supabaseError
+
+      pendingComments.value = pendingComments.value.filter(c => c.id !== commentId)
+      return { success: true }
+    } catch (err) {
+      console.error('审核通过失败:', err)
+      return { success: false, error: err.message }
+    }
+  }
+
+  // 拒绝评论（标记为垃圾）
+  async function rejectComment(commentId) {
+    try {
+      const { error: supabaseError } = await supabase
+        .from('comments')
+        .update({ is_spam: true })
+        .eq('id', commentId)
+
+      if (supabaseError) throw supabaseError
+
+      pendingComments.value = pendingComments.value.filter(c => c.id !== commentId)
+      return { success: true }
+    } catch (err) {
+      console.error('拒绝评论失败:', err)
+      return { success: false, error: err.message }
+    }
+  }
+
   return {
     comments,
     approvedComments,
@@ -131,10 +190,15 @@ export const useCommentStore = defineStore('comments', () => {
     error,
     totalComments,
     hasMore,
-    
+    pendingComments,
+    pendingLoading,
+
     fetchComments,
     addComment,
     loadMore,
-    subscribeToNewComments
+    subscribeToNewComments,
+    fetchPendingComments,
+    approveComment,
+    rejectComment
   }
 })

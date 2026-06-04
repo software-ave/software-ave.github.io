@@ -59,7 +59,7 @@
           <li>使用、复制、修改、合并、出版发行、再授权及销售本软件</li>
           <li>在软件副本中包含原作者的版权声明和本许可声明</li>
         </ul>
-        <p>项目源码：<a href="https://github.com/yourusername/blog-frontend" target="_blank">GitHub 仓库</a></p>
+        <p>项目源码：<a href="https://github.com/stardust1900/blog-frontend" target="_blank">GitHub 仓库</a></p>
       </div>
 
       <div class="about-card">
